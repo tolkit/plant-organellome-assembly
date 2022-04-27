@@ -12,13 +12,13 @@ import uuid
 def run_mbg(mbg_path, fasta_read_paths, threads):
     
     # echo some stuff back to user.
-    eprint(f"[+] run_mbg\tMBG path: {mbg_path}")
-    eprint(f"[+] run_mbg\tfasta read path(s): {fasta_read_paths}")
-    eprint(f"[+] run_mbg\tnumber of threads: {threads}")
+    eprint(f"[+] run_mbg::MBG path: {mbg_path}")
+    eprint(f"[+] run_mbg::fasta read path(s): {fasta_read_paths}")
+    eprint(f"[+] run_mbg::number of threads: {threads}")
 
     # for
     output_gfa_filename = str(uuid.uuid4()) + ".gfa"
-    eprint(f"[+] run_mbg\toutput gfa filename: {output_gfa_filename}")
+    eprint(f"[+] run_mbg::output gfa filename: {output_gfa_filename}")
 
     # spawn the process
     # sensible(?) defaults for now...

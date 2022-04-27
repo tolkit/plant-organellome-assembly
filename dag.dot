@@ -1,0 +1,14 @@
+digraph {
+    b -> c;
+    b -> b [label = " Assemble multiple times \nusing different params"];
+    c -> b [label = " Bad stats, re-run"];
+    c -> d;
+    d -> e;
+    e -> f;
+    f -> b [label = " Bad annotation, re-run"];
+    b [label = "Assemble the reads\n-> MBG"];
+    c [label = "Check output stats\n-> gfatk"];
+    d [label = "Extract mito subgraph\n-> gfatk"];
+    e [label = "Linearise mito subgraph\n-> gfatk"];
+    f [label = "Annotate linearised fasta\n-> fpma"];
+}

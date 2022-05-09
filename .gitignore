@@ -2,3 +2,5 @@
 /src/__pycache__
 /output_graph*
 /temp_token.txt
+/data/fa_gz
+/data/gfas

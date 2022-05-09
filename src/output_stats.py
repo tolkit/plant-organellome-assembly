@@ -5,7 +5,7 @@
 import subprocess
 from src.helpers import eprint
 
-def gfatk_stats(gfatk_path, output_gfa_filename):
+def gfatk_stats(gfatk_path, output_gfa_filename, prefix):
     
     # echo some stuff back to user.
     eprint(f"[+] gfatk_stats::gfatk path: {gfatk_path}")

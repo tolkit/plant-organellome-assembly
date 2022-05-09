@@ -13,7 +13,7 @@ def extract_mito(gfatk_path, output_gfa_filename):
 
     # make the new file name
     output_gfa_filename_extract_mito = output_gfa_filename.split(".")[0] + "_extract_mito.gfa"
-    eprint(f"[+] extract_mito::saving gfatk extract-mito output: {output_gfa_filename_extract_mito}")
+    eprint(f"[+] extract_mito::saving gfatk extract-mito output at: {output_gfa_filename_extract_mito}")
 
     eprint("[+] Spawning gfatk extract-mito run.")
     with open(output_gfa_filename_extract_mito, "w") as outfile:

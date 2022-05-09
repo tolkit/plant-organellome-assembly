@@ -9,16 +9,22 @@ import uuid
 # but allow them to be changed from the CLI
 
 # outputs the assembly gfa in the working dir.
-def run_mbg(mbg_path, fasta_read_paths, threads):
+def run_mbg(mbg_path, fasta_read_paths, threads, prefix):
     
     # echo some stuff back to user.
     eprint(f"[+] run_mbg::MBG path: {mbg_path}")
     eprint(f"[+] run_mbg::fasta read path(s): {fasta_read_paths}")
     eprint(f"[+] run_mbg::number of threads: {threads}")
+    eprint(f"[+] run_mbg::prefixing files with: {prefix}")
 
-    # for
-    output_gfa_filename = str(uuid.uuid4()) + ".gfa"
-    eprint(f"[+] run_mbg::output gfa filename: {output_gfa_filename}")
+    # file name depending on whether prefix is present
+    if prefix is None:
+        # randomly generate a uuid
+        output_gfa_filename = str(uuid.uuid4()) + ".gfa"
+        eprint(f"[+] run_mbg::output gfa filename: {output_gfa_filename}")
+    elif prefix is not None:
+        output_gfa_filename = str(prefix) + ".gfa"
+        eprint(f"[+] run_mbg::output gfa filename: {output_gfa_filename}")
 
     # spawn the process
     # sensible(?) defaults for now...

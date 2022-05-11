@@ -3,22 +3,32 @@
 # in case things get crazy.
 
 import subprocess
+import os
 from src.helpers import eprint
 
-def extract_mito(gfatk_path, output_gfa_filename):
-    
+# needs the gfatk executable
+# the path to the gfa
+# and where output gfa's are to be saved
+def extract_mito(gfatk_path, input_gfa_filename, gfa_directory):
+
     # echo some stuff back to user.
     eprint(f"[+] extract_mito::gfatk path: {gfatk_path}")
-    eprint(f"[+] extract_mito::output GFA filename: {output_gfa_filename}")
+    eprint(f"[+] extract_mito::input GFA filename: {input_gfa_filename}")
 
-    # make the new file name
-    output_gfa_filename_extract_mito = output_gfa_filename.split(".")[0] + "_extract_mito.gfa"
-    eprint(f"[+] extract_mito::saving gfatk extract-mito output at: {output_gfa_filename_extract_mito}")
+    # make output file name
+    output_gfa_filename_extract_mito = (
+        gfa_directory
+        + os.path.splitext(os.path.basename(input_gfa_filename))[0]
+        + "_extract_mito.gfa"
+    )
+
+    eprint(
+        f"[+] extract_mito::saving gfatk extract-mito output at: {output_gfa_filename_extract_mito}"
+    )
 
     eprint("[+] Spawning gfatk extract-mito run.")
     with open(output_gfa_filename_extract_mito, "w") as outfile:
-        subprocess.run([gfatk_path, "extract-mito", output_gfa_filename], stdout=outfile)
-    
+        subprocess.run([gfatk_path, "extract-mito", input_gfa_filename], stdout=outfile)
+
     eprint("[+] Finished gfatk extract-mito run.")
     return output_gfa_filename_extract_mito
-    

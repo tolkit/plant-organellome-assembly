@@ -3,23 +3,35 @@
 # in case things get crazy.
 
 import subprocess
+import os
 from src.helpers import eprint
 
-def extract_chloro(gfatk_path, output_gfa_filename):
-    
+
+def extract_chloro(gfatk_path, input_gfa_filename, gfa_directory):
+
     # echo some stuff back to user.
     eprint(f"[+] extract_chloro::gfatk path: {gfatk_path}")
-    eprint(f"[+] extract_chloro::output GFA filename: {output_gfa_filename}")
+    eprint(f"[+] extract_chloro::input GFA filename: {input_gfa_filename}")
 
-    # make the new file name
-    output_gfa_filename_extract_chloro = output_gfa_filename.split(".")[0] + "_extract_chloro.gfa"
-    eprint(f"[+] extract_chloro::saving gfatk extract-chloro output at: {output_gfa_filename_extract_chloro}")
+    # make output file name
+    output_gfa_filename_extract_chloro = (
+        gfa_directory
+        + os.path.splitext(os.path.basename(input_gfa_filename))[0]
+        + "_extract_chloro.gfa"
+    )
+
+    eprint(
+        f"[+] extract_chloro::saving gfatk extract-chloro output at: {output_gfa_filename_extract_chloro}"
+    )
 
     eprint("[+] Spawning gfatk extract-chloro run.")
     with open(output_gfa_filename_extract_chloro, "w") as outfile:
         # there are other `gfatk extract-chloro` params that
         # may be worth including/exploring
-        subprocess.run([gfatk_path, "extract-chloro", output_gfa_filename, "--gc-upper", "0.40"], stdout=outfile)
-    
+        subprocess.run(
+            [gfatk_path, "extract-chloro", input_gfa_filename, "--gc-upper", "0.40"],
+            stdout=outfile,
+        )
+
     eprint("[+] Finished gfatk extract-chloro run.")
     return output_gfa_filename_extract_chloro

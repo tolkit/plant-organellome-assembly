@@ -11,10 +11,11 @@
 import argparse
 import subprocess
 import os
+import sys
 
 from src.helpers import eprint
 from src.run_mbg import run_mbg
-from src.output_stats import gfatk_stats
+from src.output_stats import gfatk_stats, parse_gfatk_stats_output
 from src.extract_mito import extract_mito
 from src.extract_chloro import extract_chloro
 from src.linear import linearise_gfa
@@ -66,12 +67,11 @@ parser.add_argument(
     help="if you already have an MBG output GFA, use this entry point to specify the GFA file path.",
 )
 
-
-args = parser.parse_args()
-
-# arg checking?
+# so we don't create directories unnecessarily.
+args = parser.parse_args(args=None if sys.argv[1:] else ["--help"])
 
 if __name__ == "__main__":
+
     # create the output directories
     log_directory, fasta_directory, gfa_directory = make_dirs(args.dir)
 
@@ -111,6 +111,14 @@ if __name__ == "__main__":
         output_gfa_extracted_chloro = extract_chloro(
             args.gfatk, output_gfa, gfa_directory
         )
+
+        # check here whether we have the expected three segments
+        output_gfa_extracted_chloro_log = gfatk_stats(
+            args.gfatk, output_gfa_extracted_chloro, log_directory
+        )
+
+        parse_gfatk_stats_output(output_gfa_extracted_chloro_log)
+
         # linearise
         linearise_gfa(args.gfatk, output_gfa_extracted_chloro, fasta_directory)
 
@@ -119,6 +127,13 @@ if __name__ == "__main__":
         output_gfa_extracted_chloro = extract_chloro(
             args.gfatk, output_gfa, gfa_directory
         )
+
+        # check here whether we have the expected three segments
+        output_gfa_extracted_chloro_log = gfatk_stats(
+            args.gfatk, output_gfa_extracted_chloro, log_directory
+        )
+        parse_gfatk_stats_output(output_gfa_extracted_chloro_log)
+
         # linearise both
         linearise_gfa(args.gfatk, output_gfa_extracted_mito, fasta_directory)
         linearise_gfa(args.gfatk, output_gfa_extracted_chloro, fasta_directory)

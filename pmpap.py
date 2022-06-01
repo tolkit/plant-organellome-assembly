@@ -9,6 +9,7 @@
 # gfa_directory = "poa_gfas"
 
 import argparse
+from argparse import RawTextHelpFormatter
 import subprocess
 import os
 import sys
@@ -22,11 +23,14 @@ from src.linear import linearise_gfa
 from src.make_dirs import make_dirs
 
 parser = argparse.ArgumentParser(
-    description="""
+    description="""PMPAP: Plant Mitochondrial/Plastid Assembly Pipeline:
 Assemble a plant organellome.
 See installation instructions for dependencies.
-"""
+<https://github.com/tolkit/plant-organellome-assembly>
+""",
+    formatter_class=RawTextHelpFormatter,
 )
+
 parser.add_argument(
     "reads",
     metavar="reads",
@@ -70,11 +74,22 @@ parser.add_argument(
 # so we don't create directories unnecessarily.
 args = parser.parse_args(args=None if sys.argv[1:] else ["--help"])
 
+# TODO: add annotation output (chloro + mito)
+# TODO: some verbose output of whether the mitochondrial assembly is
+# good or not.
+# TODO: potentially annotate chloroplast before assembly
+# and work out which way segments should go.
+# gfatk path <PATH> can then be called to assemble the segments
+
 if __name__ == "__main__":
 
+    eprint(
+        "[+]\tRunning pmpap:\nThe plant mitochondrial/organelle genome assembly pipeline.\n"
+    )
     # create the output directories
     log_directory, fasta_directory, gfa_directory = make_dirs(args.dir)
 
+    # if the user supplies a GFA, we don't need to run MBG
     if args.gfa:
         # copy the GFA to our file structure location, so we don't break stuff below
         # if we have a prefix, give it that prefix too
@@ -86,33 +101,37 @@ if __name__ == "__main__":
             output_gfa = gfa_directory + os.path.basename(args.gfa)
 
         subprocess.call(["cp", args.gfa, copy_location])
-
+    # else we run MBG
     else:
         if args.reads is None:
-            parser.error("--reads was not specified. required is --gfa is absent.")
+            parser.error("--reads was not specified. required if --gfa is absent.")
         # we make the output gfa from MBG
         # ~ 5-10 mins.
         output_gfa = run_mbg(
             args.mbg, args.reads, args.threads, args.prefix, gfa_directory
         )
 
-    # now begin the pipeline
-
+    # now begin the MBG manipulation pipeline
     # output a log file of the assembly GFA
+    # useful for manual inspection if the assembly is crazy.
     gfatk_stats(args.gfatk, output_gfa, log_directory)
 
     # extract organelle from GFA
+    # either the mitochondria
     if args.organelle == "mitochondria":
         output_gfa_extracted_mito = extract_mito(args.gfatk, output_gfa, gfa_directory)
         # linearise
         linearise_gfa(args.gfatk, output_gfa_extracted_mito, fasta_directory)
 
+    # the chloroplast
     elif args.organelle == "chloroplast":
         output_gfa_extracted_chloro = extract_chloro(
             args.gfatk, output_gfa, gfa_directory
         )
 
         # check here whether we have the expected three segments
+        # these segments correspond to the LSC, SSC, and IR regions
+        # currently we exit if they are not present (or there are too many segments)
         output_gfa_extracted_chloro_log = gfatk_stats(
             args.gfatk, output_gfa_extracted_chloro, log_directory
         )
@@ -122,6 +141,7 @@ if __name__ == "__main__":
         # linearise
         linearise_gfa(args.gfatk, output_gfa_extracted_chloro, fasta_directory)
 
+    # or both
     elif args.organelle == "both":
         output_gfa_extracted_mito = extract_mito(args.gfatk, output_gfa, gfa_directory)
         output_gfa_extracted_chloro = extract_chloro(

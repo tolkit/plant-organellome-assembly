@@ -1,43 +1,58 @@
-# pm/o-gap
+# pmpap
 
-Plant mitochondrial/organelle genome assembly pipeline.
+A plant mitochondrial/organelle genome assembly pipeline.
 
 <p align="center">
      <img width="300" height="132"
     src="https://www.darwintreeoflife.org/wp-content/themes/dtol/dist/assets/gfx/dtol-logo-round.png">
 </p>
 
-A draft attempt to produced a finished plant mitochondrial assembly from raw reads.
-
-The required input for the pipeline (list to be finalised):
-- raw reads (fa/fa.gz)
-
 ## Pipeline
 
-- Assemble the reads using MBG.
-  - Might be worth assembling multiple times with different parameters anyway from the start. 
-- Check the statistics of the output GFA.
-  - If it's no good (we can define some cut-off parameters), re-run MBG with different parameters.
-- Extract the putative mitochondrial genome subgraph.
-- Check the extracted subgraph.
-- Linearise the subgraph.
-- Annotate the linearised mitochondrion to see if it's complete.
-(- If complete, annotate fully annotate with MitoFinder.)
+### Overview
 
-<p align="center">
-    <img src="./dag.png" width="60%">
-</p>
+- Assemble the reads using MBG.
+- Check the statistics of the output GFA.
+- Extract the putative mitochondrial genome subgraph.
+- Extract the putative chloroplast genome subgraph.
+  - For the chloroplast, if the number of segments is not equal to 3, we exit.
+- Linearise the subgraph.
+- Annotate the linearised organelle genome to see if it's complete.
+
+### CLI usage
+
+```bash
+usage: pmpap.py [-h] [--threads THREADS] [--mbg MBG] [--gfatk GFATK] [--organelle {mitochondria,chloroplast,both}]
+               [--prefix [PREFIX]] [--dir [DIR]] [--gfa [GFA]]
+               [reads]
+
+PMPAP: Plant Mitochondrial/Plastid Assembly Pipeline:
+Assemble a plant organellome.
+See installation instructions for dependencies.
+<https://github.com/tolkit/plant-organellome-assembly>
+
+positional arguments:
+  reads                 the raw reads to be processed. gzipped or otherwise.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --threads THREADS     number of threads MBG assembles with.
+  --mbg MBG             path to MBG executable.
+  --gfatk GFATK         path to gfatk executable.
+  --organelle {mitochondria,chloroplast,both}
+                        assemble a mitochondrial or chloroplast genome, or both.
+  --prefix [PREFIX]     prefix for all of the output files. otherwise a random UUID is generated.
+  --dir [DIR]           directory where all output directories are to store their output.
+  --gfa [GFA]           if you already have an MBG output GFA, use this entry point to specify the GFA file path.
+```
+
+It's not very configurable at the moment, but work is in progress to make the interface more configurable.
 
 ## Dependencies
 
-Must be in PATH.
+Must be in PATH. Or install and provide location on the command line.
 
-- MBG
-- gfatk
-- fpma (which includes need for HMMER (and a clone of the repo.))
-(- MitoFinder)
-
-## Questions
-
-- For both mito & cp?
-- Run mitofinder separately?
+- MBG (https://github.com/maickrau/MBG; conda installation easiest.)
+- gfatk (https://github.com/tolkit/gfatk/; build from source, working on making this easier to install.)
+- fpma (https://github.com/tolkit/fpma/; build from source. Database in this repo also required.)
+- fppa (work in progress at https://github.com/tolkit/fppa/. Nothing to do yet.)

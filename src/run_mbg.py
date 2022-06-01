@@ -28,6 +28,7 @@ def run_mbg(mbg_path, fasta_read_paths, threads, prefix, gfa_directory):
 
     # spawn the process
     # sensible(?) defaults for now...
+    # TODO: Marcela help!
     eprint("[+] Spawning MBG assembly run.")
     subprocess.run(
         [

@@ -9,7 +9,7 @@ import uuid
 # but allow them to be changed from the CLI
 
 # outputs the assembly gfa in the working dir.
-def run_mbg(mbg_path, fasta_read_paths, threads, prefix, gfa_directory):
+def run_mbg(mbg_path, fasta_read_paths, threads, k, a, w, u, prefix, gfa_directory):
 
     # echo some stuff back to user.
     eprint(f"[+] run_mbg::MBG path: {mbg_path}")
@@ -38,13 +38,13 @@ def run_mbg(mbg_path, fasta_read_paths, threads, prefix, gfa_directory):
             "-o",
             output_gfa_filename,
             "-k",
-            "1001",
+            k,
             "-a",
-            "5",
+            a,
             "-w",
-            "250",
+            w,
             "-u",
-            "150",
+            u,
         ]
     )
 

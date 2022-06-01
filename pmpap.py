@@ -38,10 +38,30 @@ parser.add_argument(
     nargs="?",
     help="the raw reads to be processed. gzipped or otherwise.",
 )
-parser.add_argument(
-    "--threads", default=10, help="number of threads MBG assembles with."
-)
 parser.add_argument("--mbg", type=str, default="MBG", help="path to MBG executable.")
+parser.add_argument(
+    "--mbg-threads", default=10, help="number of threads MBG assembles with."
+)
+parser.add_argument(
+    "--mbg-k",
+    default=5001,
+    help="the k option value which MBG will assemble with. This is the kmer size.",
+)
+parser.add_argument(
+    "--mbg-a",
+    default=5,
+    help="the a option value which MBG will assemble with. This is the minimum kmer abundance.",
+)
+parser.add_argument(
+    "--mbg-w",
+    default=250,
+    help="the w option value which MBG will assemble with. This is the window size, cannot be larger than k - 30.",
+)
+parser.add_argument(
+    "--mbg-u",
+    default=150,
+    help="the u option value which MBG will assemble with. This is the minimum unitig abundance.",
+)
 parser.add_argument(
     "--gfatk", type=str, default="gfatk", help="path to gfatk executable."
 )
@@ -84,7 +104,7 @@ args = parser.parse_args(args=None if sys.argv[1:] else ["--help"])
 if __name__ == "__main__":
 
     eprint(
-        "[+]\tRunning pmpap:\nThe plant mitochondrial/organelle genome assembly pipeline.\n"
+        "\nRunning pmpap:\nThe plant mitochondrial/organelle genome assembly pipeline.\n"
     )
     # create the output directories
     log_directory, fasta_directory, gfa_directory = make_dirs(args.dir)
@@ -108,7 +128,15 @@ if __name__ == "__main__":
         # we make the output gfa from MBG
         # ~ 5-10 mins.
         output_gfa = run_mbg(
-            args.mbg, args.reads, args.threads, args.prefix, gfa_directory
+            args.mbg,
+            args.reads,
+            args.mbg_threads,
+            args.mbg_k,
+            args.mbg_a,
+            args.mbg_w,
+            args.mbg_u,
+            args.prefix,
+            gfa_directory,
         )
 
     # now begin the MBG manipulation pipeline

@@ -54,9 +54,9 @@ def parse_gfatk_stats_output(input_gfa_filename):
             # given that there is a single subgraph, check number of segments
             # in the subgraph. It will be the second line
             no_segments = int(lines[1].split(" ")[-1])
-            if no_segments != 3:
+            if no_segments not in [1, 3]:
                 eprint(
-                    f"[+] gfatk_stats::number of segments in this subgraph ({no_segments}) is not equal to 3; exiting."
+                    f"[+] gfatk_stats::number of segments in this subgraph ({no_segments}) is not equal to 1 or 3; exiting."
                 )
                 sys.exit(1)
 

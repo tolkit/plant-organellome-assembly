@@ -29,7 +29,15 @@ def extract_chloro(gfatk_path, input_gfa_filename, gfa_directory):
         # there are other `gfatk extract-chloro` params that
         # may be worth including/exploring
         subprocess.run(
-            [gfatk_path, "extract-chloro", input_gfa_filename, "--gc-upper", "0.40"],
+            [
+                gfatk_path,
+                "extract-chloro",
+                input_gfa_filename,
+                "--gc-upper",
+                "0.40",
+                "--gc-lower",
+                "0.34",
+            ],
             stdout=outfile,
         )
 

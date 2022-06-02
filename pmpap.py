@@ -3,6 +3,7 @@
 # - Marcela Uliano
 # - Lucia Campos
 # - Alex Twyford
+# - Shane McCarthy
 
 # log_directory = "poa_logs"
 # fasta_directory = "poa_fastas"

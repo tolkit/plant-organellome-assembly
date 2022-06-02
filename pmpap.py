@@ -9,7 +9,7 @@
 # gfa_directory = "poa_gfas"
 
 import argparse
-from argparse import RawTextHelpFormatter
+from argparse import ArgumentDefaultsHelpFormatter
 import subprocess
 import os
 import sys
@@ -23,12 +23,9 @@ from src.linear import linearise_gfa
 from src.make_dirs import make_dirs
 
 parser = argparse.ArgumentParser(
-    description="""PMPAP: Plant Mitochondrial/Plastid Assembly Pipeline:
-Assemble a plant organellome.
-See installation instructions for dependencies.
-<https://github.com/tolkit/plant-organellome-assembly>
+    description="""PMPAP: Plant Mitochondrial/Plastid Assembly Pipeline: https://github.com/tolkit/plant-organellome-assembly
 """,
-    formatter_class=RawTextHelpFormatter,
+    formatter_class=ArgumentDefaultsHelpFormatter,
 )
 
 parser.add_argument(

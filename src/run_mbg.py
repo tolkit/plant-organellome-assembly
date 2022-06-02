@@ -1,7 +1,7 @@
 # reads + threads, run MBG
 
 import subprocess
-from src.helpers import eprint
+from src.helpers import eprint, params_to_string
 import uuid
 
 # run an instance of MBG
@@ -20,33 +20,40 @@ def run_mbg(mbg_path, fasta_read_paths, threads, k, a, w, u, prefix, gfa_directo
     # file name depending on whether prefix is present
     if prefix is None:
         # randomly generate a uuid
-        output_gfa_filename = gfa_directory + str(uuid.uuid4()) + ".gfa"
+        output_gfa_filename = (
+            gfa_directory
+            + str(uuid.uuid4())
+            + "_"
+            + params_to_string(k, a, w, u)
+            + ".gfa"
+        )
         eprint(f"[+] run_mbg::output gfa filename: {output_gfa_filename}")
     elif prefix is not None:
-        output_gfa_filename = gfa_directory + str(prefix) + ".gfa"
+        output_gfa_filename = (
+            gfa_directory + str(prefix) + "_" + params_to_string(k, a, w, u) + ".gfa"
+        )
         eprint(f"[+] run_mbg::output gfa filename: {output_gfa_filename}")
+
+    # annoying, but MBG needs `-i` specified multiple times
+    # if there are multiple fasta files to be read in
+    formatted_fasta_read_paths = []
+    if isinstance(fasta_read_paths, list):
+        for fasta_read_path in fasta_read_paths:
+            formatted_fasta_read_paths.append("-i")
+            formatted_fasta_read_paths.append(fasta_read_path)
+    else:
+        # NO spaces within each individual path
+        temp_fasta_read_paths = fasta_read_paths.split(" ")
+        for fasta_read_path in temp_fasta_read_paths:
+            formatted_fasta_read_paths.append("-i")
+            formatted_fasta_read_paths.append(fasta_read_path)
 
     # spawn the process
     # sensible(?) defaults for now...
-    # TODO: Marcela help!
     eprint("[+] Spawning MBG assembly run.")
-    subprocess.run(
-        [
-            mbg_path,
-            "-i",
-            " ".join(fasta_read_paths),
-            "-o",
-            output_gfa_filename,
-            "-k",
-            k,
-            "-a",
-            a,
-            "-w",
-            w,
-            "-u",
-            u,
-        ]
-    )
+    formatted_argument_string = f"{mbg_path} {' '.join(formatted_fasta_read_paths)} -o {output_gfa_filename} -k {str(k)} -a {str(a)} -w {str(w)} -u {str(u)} -t {str(threads)}"
+
+    subprocess.run(formatted_argument_string, shell=True)
 
     eprint("[+] Finished MBG assembly run.")
     return output_gfa_filename

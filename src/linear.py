@@ -1,12 +1,26 @@
-# use gfatk to make a linear represenation of the GFA
-# how to include `-i` flag?
-
 import subprocess
 import os
 from src.helpers import eprint
 
 
 def linearise_gfa(gfatk_path, input_gfa_extracted_organelle_filename, fasta_directory):
+    """Linearise a GFA.
+
+    Args:
+        gfatk_path (string): path to the gfatk executable.
+        input_gfa_extracted_organelle_filename (string): path to the input GFA.
+        fasta_directory (string): path to the directory where output
+            fasta's are to be saved.
+
+    Returns:
+        string: paths to the linearised fastas.
+
+    Notes:
+        `gfatk linear` is run with the `-e` flag, so linearisations
+        are made within subgraphs. This is because in the previous
+        step, `gfatk extract-chloro/mito` potentially extracts multiple
+        subgraphs. Including node coverage (`-i`) is always attempted.
+    """
 
     # echo some stuff back to user.
     eprint(f"[+] linearise_gfa::gfatk path: {gfatk_path}")
@@ -28,20 +42,21 @@ def linearise_gfa(gfatk_path, input_gfa_extracted_organelle_filename, fasta_dire
     )
 
     eprint(
-        "[+] Spawning gfatk linear run, including node coverage. May cause a stackoverflow."
+        "[+] linearise_gfa::spawning gfatk linear run, including node coverage. May cause a stackoverflow."
     )
 
     with open(output_fasta_i, "w") as outfile:
         subprocess.run(
-            [gfatk_path, "linear", "-i", input_gfa_extracted_organelle_filename],
+            [gfatk_path, "linear", "-e", "-i", input_gfa_extracted_organelle_filename],
             stdout=outfile,
         )
 
-    eprint("[+] Spawning gfatk linear run, excluding node coverage.")
+    eprint("[+] linearise_gfa::spawning gfatk linear run, excluding node coverage.")
     with open(output_fasta, "w") as outfile:
         subprocess.run(
-            [gfatk_path, "linear", input_gfa_extracted_organelle_filename],
+            [gfatk_path, "linear", "-e", input_gfa_extracted_organelle_filename],
             stdout=outfile,
         )
 
-    eprint("[+] Finished gfatk linear run.")
+    eprint("[+] linearise_gfa::finished gfatk linear run.")
+    return output_fasta_i, output_fasta

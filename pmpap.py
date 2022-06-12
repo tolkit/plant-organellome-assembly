@@ -5,9 +5,9 @@
 # - Alex Twyford
 # - Shane McCarthy
 
-# log_directory = "poa_logs"
-# fasta_directory = "poa_fastas"
-# gfa_directory = "poa_gfas"
+# TODO:
+# quite a lot of repitition, especially with the
+# annotation pipeline. Refactor at some point.
 
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
@@ -15,13 +15,14 @@ import subprocess
 import os
 import sys
 
-from src.helpers import eprint
+from src.helpers import eprint, check_args_and_tools
 from src.run_mbg import run_mbg
 from src.output_stats import gfatk_stats, parse_gfatk_stats_output
 from src.extract_mito import extract_mito
 from src.extract_chloro import extract_chloro
 from src.linear import linearise_gfa
 from src.make_dirs import make_dirs
+from src.annotation import annotate
 
 parser = argparse.ArgumentParser(
     description="""PMPAP: Plant Mitochondrial/Plastid Assembly Pipeline: https://github.com/tolkit/plant-organellome-assembly
@@ -88,11 +89,27 @@ parser.add_argument(
     nargs="?",
     help="if you already have an MBG output GFA, use this entry point to specify the GFA file path.",
 )
+# the annotation pipeline requires quite a few more args!
+parser.add_argument(
+    "--annotation",
+    type=str,
+    choices=["mitochondria", "chloroplast", "both"],
+    nargs="?",
+    help="annotate a mitochondrial or chloroplast genome, or both. Omitting this option will not annotate anything.",
+)
+parser.add_argument(
+    "--nhmmer", type=str, default="nhmmer", help="path to nhmmer executable."
+)
+parser.add_argument("--fpma", type=str, default="fpma", help="path to fpma executable.")
+parser.add_argument("--fpma-hmms", type=str, help="path to fpma-hmms directory.")
+parser.add_argument("--fppa", type=str, default="fppa", help="path to fppa executable.")
+parser.add_argument("--fppa-hmms", type=str, help="path to fppa-hmms directory.")
 
 # so we don't create directories unnecessarily.
 args = parser.parse_args(args=None if sys.argv[1:] else ["--help"])
+# check our args
+check_args_and_tools(args)
 
-# TODO: add annotation output (chloro + mito)
 # TODO: some verbose output of whether the mitochondrial assembly is
 # good or not.
 # TODO: potentially annotate chloroplast before assembly
@@ -105,7 +122,15 @@ if __name__ == "__main__":
         "\nRunning pmpap:\nThe plant mitochondrial/organelle genome assembly pipeline.\n"
     )
     # create the output directories
-    log_directory, fasta_directory, gfa_directory = make_dirs(args.dir)
+    # annoyingly these directories are
+    # created even if annotation is not wanted.
+    (
+        log_directory,
+        fasta_directory,
+        gfa_directory,
+        gff_directory,
+        annotation_directory,
+    ) = make_dirs(args.dir)
 
     # if the user supplies a GFA, we don't need to run MBG
     if args.gfa:
@@ -122,7 +147,7 @@ if __name__ == "__main__":
     # else we run MBG
     else:
         if args.reads is None:
-            parser.error("--reads was not specified. required if --gfa is absent.")
+            parser.error("[-] --reads was not specified. required if --gfa is absent.")
         # we make the output gfa from MBG
         # ~ 5-10 mins.
         output_gfa = run_mbg(
@@ -137,7 +162,7 @@ if __name__ == "__main__":
             gfa_directory,
         )
 
-    # now begin the MBG manipulation pipeline
+    # now begin the MBG GFA manipulation pipeline
     # output a log file of the assembly GFA
     # useful for manual inspection if the assembly is crazy.
     gfatk_stats(args.gfatk, output_gfa, log_directory)
@@ -145,9 +170,40 @@ if __name__ == "__main__":
     # extract organelle from GFA
     # either the mitochondria
     if args.organelle == "mitochondria":
+        # extract the mito
         output_gfa_extracted_mito = extract_mito(args.gfatk, output_gfa, gfa_directory)
+        eprint(f"mito path: {output_gfa_extracted_mito}")
+        # maybe we want to throw out some stats here?
+        gfatk_stats(args.gfatk, output_gfa_extracted_mito, log_directory)
         # linearise
-        linearise_gfa(args.gfatk, output_gfa_extracted_mito, fasta_directory)
+        linear_fasta_i_mito, linear_fasta_mito = linearise_gfa(
+            args.gfatk, output_gfa_extracted_mito, fasta_directory
+        )
+        eprint(f"[+]\tLinearised mitochondrial genome paths: {linear_fasta_i_mito}, {linear_fasta_mito}")
+        # if the annotation flag is set, we run the annotation pipeline
+        if args.annotation is not None:
+            fpma_path = args.fpma
+            fpma_hmms = args.fpma_hmms
+            nhmmer_path = args.nhmmer
+            # run annotation on both fastas.
+            annotate(
+                linear_fasta_i_mito,
+                "mitochondria",
+                fpma_path,
+                fpma_hmms,
+                nhmmer_path,
+                gff_directory,
+                annotation_directory,
+            )
+            annotate(
+                linear_fasta_mito,
+                "mitochondria",
+                fpma_path,
+                fpma_hmms,
+                nhmmer_path,
+                gff_directory,
+                annotation_directory,
+            )
 
     # the chloroplast
     elif args.organelle == "chloroplast":
@@ -165,7 +221,35 @@ if __name__ == "__main__":
         parse_gfatk_stats_output(output_gfa_extracted_chloro_log)
 
         # linearise
-        linearise_gfa(args.gfatk, output_gfa_extracted_chloro, fasta_directory)
+        linear_fasta_i_chloro, linear_fasta_chloro = linearise_gfa(
+            args.gfatk, output_gfa_extracted_chloro, fasta_directory
+        )
+        
+        # if the annotation flag is set, we run the annotation pipeline
+        if args.annotation is not None:
+            fppa_path = args.fppa
+            fppa_hmms = args.fppa_hmms
+            nhmmer_path = args.nhmmer
+            # run annotation on both fastas.
+            annotate(
+                linear_fasta_i_chloro,
+                "chloroplast",
+                fppa_path,
+                fppa_hmms,
+                nhmmer_path,
+                gff_directory,
+                annotation_directory,
+            )
+            annotate(
+                linear_fasta_chloro,
+                "chloroplast",
+                fppa_path,
+                fppa_hmms,
+                nhmmer_path,
+                gff_directory,
+                annotation_directory,
+            )
+
 
     # or both
     elif args.organelle == "both":
@@ -181,7 +265,54 @@ if __name__ == "__main__":
         parse_gfatk_stats_output(output_gfa_extracted_chloro_log)
 
         # linearise both
-        linearise_gfa(args.gfatk, output_gfa_extracted_mito, fasta_directory)
-        linearise_gfa(args.gfatk, output_gfa_extracted_chloro, fasta_directory)
-
-    # if the organelle is mitochondrial, also run fpma
+        linear_fasta_i_mito, linear_fasta_mito = linearise_gfa(
+            args.gfatk, output_gfa_extracted_mito, fasta_directory
+        )
+        linear_fasta_i_chloro, linear_fasta_chloro = linearise_gfa(
+            args.gfatk, output_gfa_extracted_chloro, fasta_directory
+        )
+        
+        # if the annotation flag is set, we run the annotation pipeline
+        if args.annotation is not None:
+            fppa_path = args.fppa
+            fppa_hmms = args.fppa_hmms
+            fpma_path = args.fpma
+            fpma_hmms = args.fpma_hmms
+            nhmmer_path = args.nhmmer
+            # run annotation on both fastas.
+            annotate(
+                linear_fasta_i_chloro,
+                "chloroplast",
+                fppa_path,
+                fppa_hmms,
+                nhmmer_path,
+                gff_directory,
+                annotation_directory,
+            )
+            annotate(
+                linear_fasta_chloro,
+                "chloroplast",
+                fppa_path,
+                fppa_hmms,
+                nhmmer_path,
+                gff_directory,
+                annotation_directory,
+            )
+            annotate(
+                linear_fasta_i_mito,
+                "mitochondria",
+                fpma_path,
+                fpma_hmms,
+                nhmmer_path,
+                gff_directory,
+                annotation_directory,
+            )
+            annotate(
+                linear_fasta_mito,
+                "mitochondria",
+                fpma_path,
+                fpma_hmms,
+                nhmmer_path,
+                gff_directory,
+                annotation_directory,
+            )

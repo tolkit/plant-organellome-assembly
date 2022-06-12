@@ -10,6 +10,23 @@ import uuid
 
 # outputs the assembly gfa in the working dir.
 def run_mbg(mbg_path, fasta_read_paths, threads, k, a, w, u, prefix, gfa_directory):
+    """Run MBG (https://github.com/maickrau/MBG).
+
+    Args:
+        mbg_path (string): path to the MBG executable.
+        fasta_read_paths (string): path to the fasta file(s) to be assembled.
+        threads (string): number of threads to use (MBG param).
+        k (int): kmer size (MBG param).
+        a (int): minimum kmer abundance size (MBG param).
+        w (int): window size (MBG param).
+        u (int): minimum unitig abundance (MBG param).
+        prefix (string): prefix for the output files. If not provided, a
+            random uuid will be used.
+        gfa_directory (string): path to the directory to write the GFA to.
+
+    Returns:
+        string: path to the assembled GFA.
+    """
 
     # echo some stuff back to user.
     eprint(f"[+] run_mbg::MBG path: {mbg_path}")

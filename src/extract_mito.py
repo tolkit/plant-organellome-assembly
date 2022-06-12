@@ -6,10 +6,22 @@ import subprocess
 import os
 from src.helpers import eprint
 
-# needs the gfatk executable
-# the path to the gfa
-# and where output gfa's are to be saved
+
 def extract_mito(gfatk_path, input_gfa_filename, gfa_directory):
+    """Extract the mitochondrion from a GFA.
+
+    Args:
+        gfatk_path (string): path to the gfatk executable.
+        input_gfa_filename (string): path to the input GFA.
+        gfa_directory (string): path to the directory where output
+            GFA's are to be saved.
+
+    Returns:
+        string: path to the output putative mitochondrion GFA.
+
+    Notes:
+        ...
+    """
 
     # echo some stuff back to user.
     eprint(f"[+] extract_mito::gfatk path: {gfatk_path}")
@@ -26,9 +38,9 @@ def extract_mito(gfatk_path, input_gfa_filename, gfa_directory):
         f"[+] extract_mito::saving gfatk extract-mito output at: {output_gfa_filename_extract_mito}"
     )
 
-    eprint("[+] Spawning gfatk extract-mito run.")
+    eprint("[+] extract_mito::spawning gfatk extract-mito run.")
     with open(output_gfa_filename_extract_mito, "w") as outfile:
         subprocess.run([gfatk_path, "extract-mito", input_gfa_filename], stdout=outfile)
 
-    eprint("[+] Finished gfatk extract-mito run.")
+    eprint("[+] extract_mito::finished gfatk extract-mito run.")
     return output_gfa_filename_extract_mito

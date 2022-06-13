@@ -42,15 +42,19 @@ def extract_chloro(gfatk_path, input_gfa_filename, gfa_directory):
     with open(output_gfa_filename_extract_chloro, "w") as outfile:
         # there are other `gfatk extract-chloro` params that
         # may be worth including/exploring
+        # seems like there is a larger range of GC% and
+        # plastid size than I had anticipated.
         subprocess.run(
             [
                 gfatk_path,
                 "extract-chloro",
                 input_gfa_filename,
                 "--gc-upper",
-                "0.40",
+                "0.41",
                 "--gc-lower",
-                "0.34",
+                "0.30",
+                "--size-upper",
+                "250000",
             ],
             stdout=outfile,
         )

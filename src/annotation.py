@@ -2,6 +2,7 @@ import subprocess
 import os
 from src.helpers import eprint
 
+
 def annotate(
     path_to_fasta,
     organelle,
@@ -81,7 +82,7 @@ def annotate(
                     "--gff",
                     output_gff_file,
                     "--e-value",
-                    "0.00000001"
+                    "0.00000001",
                 ],
                 stdout=outfile,
             )
@@ -102,14 +103,10 @@ def annotate(
                     "--gff",
                     output_gff_file,
                     "--e-value",
-                    "0.00000001"
+                    "0.00000001",
                 ],
                 stdout=outfile,
             )
     # return the path to the annotated fasta file log file
     return output_log_file
 
-# a function to parse fpma/fppa output
-# and print whether it was a success or not
-def parse_annotation_output():
-    None

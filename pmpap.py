@@ -179,7 +179,9 @@ if __name__ == "__main__":
         linear_fasta_i_mito, linear_fasta_mito = linearise_gfa(
             args.gfatk, output_gfa_extracted_mito, fasta_directory
         )
-        eprint(f"[+]\tLinearised mitochondrial genome paths: {linear_fasta_i_mito}, {linear_fasta_mito}")
+        eprint(
+            f"[+]\tLinearised mitochondrial genome paths: {linear_fasta_i_mito}, {linear_fasta_mito}"
+        )
         # if the annotation flag is set, we run the annotation pipeline
         if args.annotation is not None:
             fpma_path = args.fpma
@@ -224,7 +226,7 @@ if __name__ == "__main__":
         linear_fasta_i_chloro, linear_fasta_chloro = linearise_gfa(
             args.gfatk, output_gfa_extracted_chloro, fasta_directory
         )
-        
+
         # if the annotation flag is set, we run the annotation pipeline
         if args.annotation is not None:
             fppa_path = args.fppa
@@ -250,7 +252,6 @@ if __name__ == "__main__":
                 annotation_directory,
             )
 
-
     # or both
     elif args.organelle == "both":
         output_gfa_extracted_mito = extract_mito(args.gfatk, output_gfa, gfa_directory)
@@ -271,7 +272,7 @@ if __name__ == "__main__":
         linear_fasta_i_chloro, linear_fasta_chloro = linearise_gfa(
             args.gfatk, output_gfa_extracted_chloro, fasta_directory
         )
-        
+
         # if the annotation flag is set, we run the annotation pipeline
         if args.annotation is not None:
             fppa_path = args.fppa

@@ -17,7 +17,7 @@ A plant mitochondrial/organelle genome assembly pipeline.
   - Note there may be more than one subgraph, and this is expected in some cases.
 - Extract the putative chloroplast genome subgraph (<a href="https://github.com/tolkit/gfatk/">gfatk</a>).
   - We expect three segments from one subgraph, however this is not always the case.
-- Linearise the graphs.
+- Linearise the graphs (<a href="https://github.com/tolkit/gfatk/">gfatk</a>).
   - We currently linearise within each subgraph, and attempt to include node coverage.
 - Annotate the linearised organelle genome to see if it's complete.
   - Using <a href="https://github.com/tolkit/fpma/">fpma</a> and <a href="https://github.com/tolkit/fppa/">fppa</a>

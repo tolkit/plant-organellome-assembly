@@ -162,8 +162,8 @@ python3 pmpap.py \
     --prefix my_plant \
     --dir /path/to/output \
     --annotation both \
-    --fpma-hmms fpma-hmms \
-    --fppa-hmms fppa-hmms \
+    --fpma-hmms /path/to/mito/hmms/clade/dir \
+    --fppa-hmms /path/to/plastid/hmms/clade/dir \
     /path/to/raw/reads.fa.gz
 ```
 

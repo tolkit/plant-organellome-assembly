@@ -21,4 +21,4 @@ python3 pmpap.py \
     --nhmmer $NHMMER \
     --fpma-hmms $FPMA_ANGIOSPERM_HMMS \
     --fppa-hmms $FPPA_ANGIOSPERM_HMMS \
-    --gfa ./poa_gfas/TEST_k=5001a=5w=250u=150_extract_mito.gfa
+    $TEST_DATA

@@ -42,7 +42,7 @@ def extract_mito(gfatk_path, input_gfa_filename, gfa_directory):
     with open(output_gfa_filename_extract_mito, "w") as outfile:
         # in order to account for multiple possible circular DNA molecules,
         # decrease size-lower to 90Kb
-        # up GC to 0.54. Any higher and I think we are in danger
+        # up GC to 0.50. Any higher and I think we are in danger
         # of extracting Ribosomal RNA clusters.
         # not sure we want to go lower than 0.41...
         # as this then overlaps extract-chloro
@@ -54,7 +54,7 @@ def extract_mito(gfatk_path, input_gfa_filename, gfa_directory):
                 "--size-lower",
                 "90000",
                 "--gc-upper",
-                "0.54",
+                "0.50",
                 "--gc-lower",
                 "0.41",
             ],

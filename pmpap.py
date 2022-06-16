@@ -34,7 +34,7 @@ parser.add_argument(
     "reads",
     metavar="reads",
     type=str,
-    nargs="?",
+    nargs="+",
     help="the raw reads to be processed. gzipped or otherwise.",
 )
 parser.add_argument("--mbg", type=str, default="MBG", help="path to MBG executable.")

@@ -121,7 +121,9 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 I'll go through the installation in this BASH script.
 
 ```bash
-# gfatk v0.2.1 (latest) is on crates.io, so get it directly.
+# gfatk v0.2.14 (latest) is on crates.io, so get it directly.
+# please do make sure it's the latest, as a few important bugs in 
+# gfatk have been fixed in the latest version.
 cargo install gfatk
 # check
 gfatk --version

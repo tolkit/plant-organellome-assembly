@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # run the full pipeline on raw reads.
+# this will assemble both plastid + mito
 
 # I have gfatk, MBG, fppa, fpma in my $PATH
 # I need to point to nhmmer, and both sets of hmms
@@ -16,8 +17,8 @@ TEST_DATA="./data/fa_gz/Ailanthus_altissima.fa.gz"
 # where possible, I am using default params
 
 python3 pmpap.py \
-    --organelle "mitochondria" \
-    --annotation "mitochondria" \
+    --organelle "both" \
+    --annotation "both" \
     --nhmmer $NHMMER \
     --fpma-hmms $FPMA_ANGIOSPERM_HMMS \
     --fppa-hmms $FPPA_ANGIOSPERM_HMMS \
